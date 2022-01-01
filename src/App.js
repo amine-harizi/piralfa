@@ -1,18 +1,53 @@
-import { useState, useEffect } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import './App.css';
+import Separator from './Separator';
 import corner from './images/corner.svg';
 import hero from './images/hero.svg';
-import Separator from './Separator';
-import road from './images/road.svg';
 import question from './images/question.svg';
 import quick from './images/quick.svg';
 import creative from './images/creative.svg';
 import happy from './images/happy.svg';
 import contact from './images/contact.svg';
-import send from './images/send.svg';
+// import road from './images/road.svg';
+//import send from './images/send.svg';
 
 function App() {
+  
+  const [message, setMessage] = useState("Don't hesitate to contact us!")
+  const [error, setError] = useState(false)
   const [theme, setTheme] = useState('light');
+  const userFullName = useRef();
+  const userEmail = useRef();
+  const userMessage = useRef();
+
+  const handleContactForm = (e) => {
+    e.preventDefault();
+    const eValidate = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    let emailValue = userEmail.current.value;
+    let nameValue = userFullName.current.value;
+    let messageValue = userMessage.current.value;
+    if (messageValue && nameValue && eValidate.test(emailValue)) {
+
+      // ------> Backend USER - DATA
+      const userData = {
+        name: nameValue,
+        email: emailValue,
+        userMessage: messageValue,
+      }
+      // <--------------------------
+
+      setMessage("Thanks for your message, we will reply soon!")
+      setError(false)
+      userFullName.current.value = ""
+      userEmail.current.value = ""
+      userMessage.current.value = ""
+    }
+    else {
+      setError(true)
+      setMessage('Invalid input')
+    }
+  }
+
   const handleThemeChange = () => {
     theme === 'dark' ? setTheme('light') : setTheme('dark');
   }
@@ -24,8 +59,8 @@ function App() {
     {
       text: 'Great user experience',
       img: happy
-    }
-    , {
+    },
+    {
       text: 'Creative team.',
       img: creative
     }, {
@@ -143,10 +178,10 @@ function App() {
             </div>
           </div>
           <div className="flex flex-col md:flex-row justify-around px-4">
-            <form action="" className="md:w-5/12 flex flex-col px-4 py-4">
-              <input type="text" className="bg-transparent outline-none border-b-2 border-seco focus:border-b-4 transition-all duration-150 my-4 px-2" placeholder="name & surname" />
-              <input type="email" className="bg-transparent outline-none border-b-2 border-seco focus:border-b-4 transition-all duration-150 my-4 px-2" placeholder="your e-mail" />
-              <textarea name="user-message" id="user-message" cols="30" rows="30" placeholder="your message" className="bg-transparent outline-none ring-1 ring-seco focus:ring-2 h-28 resize-none my-4"></textarea>
+            <form action="" className="md:w-5/12 flex flex-col px-4 py-4" onSubmit={handleContactForm}>
+              <input type="text" className="bg-transparent outline-none border-b-2 border-seco focus:border-b-4 transition-all duration-150 my-4 px-2" placeholder="name & surname" ref={userFullName} />
+              <input type="email" className="bg-transparent outline-none border-b-2 border-seco focus:border-b-4 transition-all duration-150 my-4 px-2" placeholder="your e-mail" ref={userEmail} />
+              <textarea name="user-message" id="user-message" cols="30" rows="30" placeholder="your message" className="bg-transparent outline-none ring-1 ring-seco focus:ring-2 h-28 resize-none my-4" ref={userMessage} ></textarea>
               <button type="submit" className="flex rounded bg-seco opacity-80 font-bold hover:opacity-100 transition-opacity duration-200 mx-auto items-center align-middle p-2">
                 <p className="mr-1">Send</p>
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -154,8 +189,10 @@ function App() {
                 </svg>
               </button>
             </form>
-            <img src={contact} alt="contact-us" className="max-w-sm w-4/12 mx-auto" />
+            <img src={contact} alt="contact-us" className="hidden sm:block max-w-sm w-4/12 mx-auto mb-4" />
+           
           </div>
+          <p className={`rounded text-white md:w-1/3 ml-8 mx-4 p-1 ${error ? 'bg-red-500 ring ring-red-400' : 'bg-green-500 ring ring-green-400'}`}>{message}</p>
         </section>
         <footer className="dark:bg-white text-center h-4 mt-8 bg-slate-900 text-white dark:text-black">
           Copyright &copy; {new Date().getFullYear()}. all rights reserved
@@ -165,4 +202,6 @@ function App() {
 
   );
 }
+
+
 export default App;
